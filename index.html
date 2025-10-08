@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <link href="./dist/output.css" rel="stylesheet">
+
+  <style>
+    /* === Animations === */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(40px);} to {opacity: 1; transform: translateY(0);} }
+    @keyframes shimmer { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+    /* === General === */
+    body {
+      background: #000;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* === Gradient Text === */
+    .gradient-text {
+      background: linear-gradient(270deg, #ff007f, #ff55a9, #ff007f);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 6s ease infinite;
+      text-shadow: 0 0 10px rgba(255,0,127,0.6);
+    }
+
+    /* === Header === */
+    header {
+      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 50;
+      position: sticky;
+      top: 0;
+      width: 100%;
+    }
+
+    header img {
+      border-radius: 50%;
+      border: 2px solid #ff007f;
+      box-shadow: 0 0 15px rgba(255,0,127,0.4);
+    }
+
+    nav a {
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #ff007f;
+    }
+
+    /* === Mobile menu button === */
+    #mobile-menu-button span {
+      display: block;
+      height: 3px;
+      width: 28px;
+      background: white;
+      margin: 5px 0;
+      transition: all 0.3s ease;
+    }
+    #mobile-menu-button.open span:nth-child(1) {
+      transform: rotate(45deg) translateY(8px);
+    }
+    #mobile-menu-button.open span:nth-child(2) {
+      opacity: 0;
+    }
+    #mobile-menu-button.open span:nth-child(3) {
+      transform: rotate(-45deg) translateY(-8px);
+    }
+
+    /* === Mobile nav panel === */
+    #mobile-nav-panel {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 80%;
+      max-width: 300px;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      backdrop-filter: blur(10px);
+      transition: right 0.3s ease;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      z-index: 60;
+    }
+    #mobile-nav-panel.show {
+      right: 0;
+    }
+    #mobile-nav-panel a {
+      font-size: 1.25rem;
+      color: white;
+    }
+    #mobile-nav-panel a:hover {
+      color: #ff007f;
+    }
+
+    /* === Overlay for clicks outside mobile nav === */
+    #mobile-nav-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 55;
+    }
+    #mobile-nav-overlay.show {
+      display: block;
+    }
+
+    /* === Hero === */
+    .hero {
+      position: relative;
+      padding-top: 8rem;
+      padding-bottom: 8rem;
+      z-index: 5;
+    }
+
+    .hero-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 0 40px rgba(255,0,127,0.15);
+      transition: transform 0.3s ease;
+    }
+    .hero-card:hover {
+      transform: translateY(-6px);
+    }
+
+    /* === Button === */
+    #cta-button {
+      display: inline-block;
+      padding: 0.9rem 2.5rem;
+      border-radius: 0.75rem;
+      background: #ff007f;
+      font-weight: 600;
+      color: #fff;
+      text-align: center;
+      margin-top: 1rem;
+      box-shadow: 0 0 20px rgba(255,0,127,0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    #cta-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 35px rgba(255,0,127,0.7);
+    }
+
+    /* === UI/UX Section === */
+    .uiux-section {
+      padding: 6rem 1.5rem;
+      background: radial-gradient(circle at top left, rgba(255,0,127,0.05), rgba(0,0,0,1));
+    }
+    .uiux-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .uiux-section p {
+      text-align: center;
+      color: #d1d5db;
+      max-width: 700px;
+      margin: 0 auto 3rem auto;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .ui-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      transition: transform 0.4s, box-shadow 0.4s;
+      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+    }
+    .ui-card h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      color: #ff55a9;
+      text-shadow: 0 0 8px rgba(255,0,127,0.4);
+    }
+    .ui-card p {
+      color: #ccc;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .ui-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 0 30px rgba(255,0,127,0.6);
+    }
+
+    /* === Scroll Animations === */
+    [data-animate] {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    [data-animate].visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <div class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
+      <img src="images/profile.jpg" alt="Logo" class="h-20 w-20 object-cover">
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex gap-6 font-medium text-gray-300">
+        <a href="portfolio.html">Portfolio</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <!-- Mobile Hamburger -->
+      <button id="mobile-menu-button" class="md:hidden flex flex-col justify-center items-center gap-1.5">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Overlay -->
+  <div id="mobile-nav-overlay"></div>
+
+  <!-- Mobile Nav Panel -->
+  <div id="mobile-nav-panel">
+    <a href="portfolio.html">Portfolio</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero text-center max-w-4xl mx-auto px-6">
+    <h1 id="hero-heading" class="text-5xl md:text-6xl font-bold mb-8 gradient-text"></h1>
+
+    <div class="hero-card" data-animate>
+      <p id="hero-paragraph" class="text-lg md:text-xl text-gray-200 mb-6">
+        I’m a Roblox developer, builder, and scripter. I create immersive games, interactive experiences, and fun projects that players love.  
+        Check out my portfolio to see some of my best work.
+      </p>
+      <a href="portfolio.html" id="cta-button">View Portfolio</a>
+    </div>
+  </section>
+
+  <!-- UI/UX Section -->
+  <section class="uiux-section" data-animate>
+    <h2 class="uiux-title gradient-text">UI & UX Design</h2>
+    <p>
+      Every interface I design blends creativity with purpose. From glowing buttons and animated panels  
+      to immersive menus and clean layout systems — each element is built to make Roblox experiences  
+      more fun, intuitive, and futuristic.
+    </p>
+
+    <div class="card-grid">
+      <div class="ui-card" data-animate>
+        <h3>Intuitive Layouts</h3>
+        <p>Balanced and visually clear UI structures that guide players naturally without confusion.</p>
+      </div>
+      <div class="ui-card" data-animate>
+        <h3>Immersive Feedback</h3>
+        <p>Dynamic hover effects, click animations, and sound feedback that make every action satisfying.</p>
+      </div>
+      <div class="ui-card" data-animate>
+        <h3>Stylish Modern Aesthetic</h3>
+        <p>Glassmorphism, soft glows, and neon gradients for a clean but futuristic Roblox feel.</p>
+      </div>
+      <div class="ui-card" data-animate>
+        <h3>Optimized for Performance</h3>
+        <p>Designed with lightweight UI principles — smooth on all devices without lag.</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Mobile menu toggle
+    const menuButton = document.getElementById('mobile-menu-button');
+    const mobileNavPanel = document.getElementById('mobile-nav-panel');
+    const mobileOverlay = document.getElementById('mobile-nav-overlay');
+
+    function toggleMobileMenu() {
+      menuButton.classList.toggle('open');
+      mobileNavPanel.classList.toggle('show');
+      mobileOverlay.classList.toggle('show');
+    }
+
+    menuButton.addEventListener('click', toggleMobileMenu);
+    mobileOverlay.addEventListener('click', toggleMobileMenu);
+
+    // Typing effect for hero heading
+    const headingText = "Hey, I'm Demo Name";
+    const headingEl = document.getElementById("hero-heading");
+    let charIndex = 0;
+    function typeHeading() {
+      if (charIndex < headingText.length) {
+        headingEl.textContent += headingText[charIndex];
+        charIndex++;
+        setTimeout(typeHeading, 90);
+      }
+    }
+    window.addEventListener("load", typeHeading);
+
+    // Scroll animations
+    const elements = document.querySelectorAll("[data-animate]");
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    }, { threshold: 0.2 });
+    elements.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

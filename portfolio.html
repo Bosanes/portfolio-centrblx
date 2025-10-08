@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Portfolio | Demo Name</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+/* === Folder Icon === */
+#folder-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  color: #f472b6;
+  transition: all 0.3s;
+}
+#folder-btn:hover {
+  color: #ff007f;
+}
+
+/* === Mobile Hamburger === */
+#mobile-menu-btn span {
+  display: block;
+  height: 3px;
+  width: 25px;
+  background: white;
+  margin: 5px 0;
+  transition: all 0.3s ease;
+}
+#mobile-menu-btn.open span:nth-child(1) {
+  transform: rotate(45deg) translateY(8px);
+}
+#mobile-menu-btn.open span:nth-child(2) {
+  opacity: 0;
+}
+#mobile-menu-btn.open span:nth-child(3) {
+  transform: rotate(-45deg) translateY(-8px);
+}
+
+/* === Mobile Menus === */
+#mobile-menu-panel {
+  position: fixed;
+  top: 0; left: 0;
+  width: 70%;
+  height: 100%;
+  background: #111;
+  padding: 2rem;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 50;
+}
+#mobile-projects-panel {
+  position: fixed;
+  top: 0; left: 0;
+  width: 70%;
+  height: 100%;
+  background: #1f1f1f;
+  padding: 2rem;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 50;
+  overflow-y: auto;
+}
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 40;
+}
+#overlay.active {
+  display: block;
+}
+
+/* === Project buttons in sidebar === */
+#mobile-projects-panel button {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  color: white;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+#mobile-projects-panel button:hover {
+  background: #ff007f;
+  color: black;
+}
+</style>
+</head>
+<body class="bg-black text-white">
+
+<!-- Header -->
+<header class="sticky top-0 bg-black/80 backdrop-blur-md p-4 border-b border-gray-800 z-50">
+  <div class="max-w-6xl mx-auto flex justify-between items-center px-6 relative">
+    <!-- Logo -->
+    <img src="images/profile.jpg" alt="Logo" class="h-16 w-16 object-cover rounded-full border-2 border-pink-500">
+
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex gap-6 font-medium text-gray-300">
+      <a href="index.html" class="hover:text-pink-500">Home</a>
+      <a href="portfolio.html" class="hover:text-pink-500">Portfolio</a>
+      <a href="contact.html" class="hover:text-pink-500">Contact</a>
+      <a href="admin.html" class="hover:text-pink-500">Admin</a>
+    </nav>
+
+    <!-- Mobile Hamburger -->
+    <button id="mobile-menu-btn" class="md:hidden flex flex-col justify-center items-center">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile Links Panel -->
+<div id="mobile-menu-panel" class="md:hidden">
+  <a href="index.html" class="block text-white text-lg py-2">Home</a>
+  <a href="portfolio.html" class="block text-white text-lg py-2">Portfolio</a>
+  <a href="contact.html" class="block text-white text-lg py-2">Contact</a>
+  <a href="admin.html" class="block text-white text-lg py-2">Admin</a>
+</div>
+
+<!-- Mobile Projects Panel -->
+<div id="mobile-projects-panel" class="md:hidden">
+  <h2 class="text-pink-500 font-bold text-lg mb-4">Projects</h2>
+</div>
+
+<div id="overlay"></div>
+
+<!-- Hero + Folder -->
+<div class="max-w-6xl mx-auto px-6 mt-8 relative">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-4xl font-bold text-pink-500">Portfolio Projects</h1>
+    <div class="relative md:hidden">
+      <div id="folder-btn" class="text-lg">📁 Projects</div>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="projects-grid"></section>
+</div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://jprslkrxccjefudlismu.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcnNsa3J4Y2NqZWZ1ZGxpc211Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NjY1MzAsImV4cCI6MjA3NTQ0MjUzMH0.LuMD06T2NTE2G7AEcynCKPUboulhybm6l4YKjCFpCyo"; // Replace
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const projectsGrid = document.getElementById('projects-grid');
+const folderBtn = document.getElementById('folder-btn');
+const mobileProjectsPanel = document.getElementById('mobile-projects-panel');
+
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+const overlay = document.getElementById('overlay');
+
+let allProjects = [];
+
+// Load projects
+async function loadProjects() {
+  const { data: projects, error } = await supabase.from('projects').select('id, name, description').order('created_at', { ascending: false });
+  if(error) return console.error(error);
+  allProjects = projects;
+
+  renderProjects();
+  renderMobileProjectsPanel();
+}
+
+// Render projects grid
+function renderProjects(projectId = null) {
+  const projectsToShow = projectId ? allProjects.filter(p => p.id === projectId) : allProjects;
+  projectsGrid.innerHTML = '';
+  projectsToShow.forEach(async p => {
+    const { data: media } = await supabase.from('media').select('url, type').eq('project_id', p.id);
+    let mediaHTML = '';
+    media?.forEach(item => {
+      if(item.type === 'video') mediaHTML += `<video src="${item.url}" controls class="w-full rounded"></video>`;
+      else mediaHTML += `<img src="${item.url}" class="w-full rounded">`;
+    });
+    const card = document.createElement('div');
+    card.className = 'bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-pink-500/50 transition-all';
+    card.innerHTML = `
+      <h2 class="text-xl font-bold text-pink-500 mb-2">${p.name}</h2>
+      <p class="text-gray-300 mb-2">${p.description}</p>
+      <div class="grid grid-cols-2 gap-2">${mediaHTML}</div>
+    `;
+    projectsGrid.appendChild(card);
+  });
+}
+
+// Render mobile projects panel
+function renderMobileProjectsPanel() {
+  mobileProjectsPanel.innerHTML = `<h2 class="text-pink-500 font-bold text-lg mb-4">Projects</h2>`;
+  allProjects.forEach(p => {
+    const btn = document.createElement('button');
+    btn.textContent = p.name;
+    btn.addEventListener('click', () => {
+      renderProjects(p.id);
+      closeMobileProjectsPanel();
+    });
+    mobileProjectsPanel.appendChild(btn);
+  });
+}
+
+// Mobile menu toggle
+mobileMenuBtn.addEventListener('click', () => {
+  mobileMenuBtn.classList.toggle('open');
+  mobileMenuPanel.style.transform = mobileMenuPanel.style.transform === 'translateX(0%)' ? 'translateX(-100%)' : 'translateX(0%)';
+  overlay.classList.toggle('active');
+});
+
+// Folder button toggle (mobile)
+folderBtn.addEventListener('click', () => {
+  mobileProjectsPanel.style.transform = mobileProjectsPanel.style.transform === 'translateX(0%)' ? 'translateX(-100%)' : 'translateX(0%)';
+  overlay.classList.toggle('active');
+});
+
+// Overlay click closes everything
+overlay.addEventListener('click', () => {
+  mobileMenuBtn.classList.remove('open');
+  mobileMenuPanel.style.transform = 'translateX(-100%)';
+  mobileProjectsPanel.style.transform = 'translateX(-100%)';
+  overlay.classList.remove('active');
+});
+
+function closeMobileProjectsPanel() {
+  mobileProjectsPanel.style.transform = 'translateX(-100%)';
+  overlay.classList.remove('active');
+}
+
+loadProjects();
+</script>
+
+</body>
+</html>

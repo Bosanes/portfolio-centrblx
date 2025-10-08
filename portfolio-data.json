@@ -1,0 +1,33 @@
+{
+  "projects": [
+    {
+      "title": "Epic Roblox Obby",
+      "description": "A fun obby with 50+ stages, played by thousands of users!",
+      "media": [
+        { "type": "image", "src": "images/project1-1.jpg" },
+        { "type": "image", "src": "images/project1-2.jpg" },
+        { "type": "video", "src": "videos/project1-demo.mp4" }
+      ],
+      "url": "https://www.roblox.com/games/1234567890/Epic-Roblox-Obby",
+      "category": "Obby"
+    },
+    {
+      "title": "Battle Arena",
+      "description": "Multiplayer PvP game with custom weapons & maps.",
+      "media": [
+        { "type": "image", "src": "images/project2.jpg" }
+      ],
+      "url": "https://www.roblox.com/games/9876543210/Battle-Arena",
+      "category": "PvP"
+    },
+    {
+      "title": "Adventure Quest",
+      "description": "Explore, fight monsters, and collect treasures in this adventure game.",
+      "media": [
+        { "type": "video", "src": "videos/adventure-quest.mp4" }
+      ],
+      "url": "https://www.roblox.com/games/1122334455/Adventure-Quest",
+      "category": "Adventure"
+    }
+  ]
+}

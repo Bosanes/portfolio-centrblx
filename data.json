@@ -1,0 +1,11 @@
+{
+  "name": "Demo Name",
+  "bio": "Roblox developer • Builder • Scripter\nMaking cool games & projects 🎮",
+  "profileImage": "images/profile.jpg",
+  "links": [
+    { "label": "Roblox Profile", "url": "https://www.roblox.com/users/3719528279/profile" },
+    { "label": "Discord", "url": "https://discord.com/invite/argRzyaWmU" },
+    { "label": "Twitter", "url": "https://x.com/centrblx" },
+    { "label": "Portfolio", "url": "portfolio.html" }
+  ]
+}

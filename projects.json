@@ -1,0 +1,26 @@
+{
+  "projects": {
+    "project1": {
+      "name": "Cyberpunk City",
+      "contents": {
+        "content1": {
+          "title": "Cyberpunk City",
+          "description": "UI/UX assets for this neon city Roblox game",
+          "link": "game.html?gameId=1",
+          "files": []
+        }
+      }
+    },
+    "project2": {
+      "name": "Fantasy World",
+      "contents": {
+        "content1": {
+          "title": "Fantasy World",
+          "description": "UI/UX assets for a magical low-poly world",
+          "link": "game.html?gameId=2",
+          "files": []
+        }
+      }
+    }
+  }
+}

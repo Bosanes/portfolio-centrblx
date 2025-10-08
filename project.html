@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Project | Demo Name</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white min-h-screen">
+
+<header class="sticky top-0 bg-black/80 backdrop-blur-md p-4 border-b border-gray-800">
+  <div class="max-w-6xl mx-auto flex justify-between items-center px-6">
+    <img src="images/profile.jpg" alt="Logo" class="h-20 w-20 object-cover rounded-full border-2 border-pink-500">
+    <nav class="hidden md:flex gap-6 font-medium text-gray-300">
+      <a href="index.html" class="hover:text-pink-400">Home</a>
+      <a href="portfolio.html" class="hover:text-pink-400">Portfolio</a>
+      <a href="contact.html" class="hover:text-pink-400">Contact</a>
+      <a href="admin.html" class="hover:text-pink-400">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<div class="h-28"></div>
+
+<main class="max-w-6xl mx-auto p-6">
+  <h1 id="project-name" class="text-3xl font-bold text-pink-500 mb-6"></h1>
+  <div id="contents-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <!-- Project media will be inserted here -->
+  </div>
+</main>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+// --- Supabase setup ---
+const SUPABASE_URL = "https://jprslkrxccjefudlismu.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcnNsa3J4Y2NqZWZ1ZGxpc211Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NjY1MzAsImV4cCI6MjA3NTQ0MjUzMH0.LuMD06T2NTE2G7AEcynCKPUboulhybm6l4YKjCFpCyo";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const projectNameEl = document.getElementById('project-name');
+const contentsGrid = document.getElementById('contents-grid');
+
+// --- Get Project ID from URL ---
+const urlParams = new URLSearchParams(window.location.search);
+const projectId = urlParams.get('projectId');
+if (!projectId) {
+  document.body.innerHTML = "<p class='text-center mt-20 text-red-400'>Project not found.</p>";
+  throw new Error("No projectId provided in URL");
+}
+
+async function loadProject() {
+  // Get project info
+  const { data: projects, error: projectError } = await supabase
+    .from('projects')
+    .select('id, name, description')
+    .eq('id', projectId)
+    .single();
+
+  if (projectError) {
+    console.error(projectError);
+    projectNameEl.textContent = "Project not found";
+    return;
+  }
+
+  projectNameEl.textContent = projects.name;
+
+  // Get media for this project
+  const { data: media, error: mediaError } = await supabase
+    .from('media')
+    .select('url, type')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: true });
+
+  if (mediaError) {
+    console.error(mediaError);
+    contentsGrid.innerHTML = "<p class='text-gray-400 col-span-full'>No media found.</p>";
+    return;
+  }
+
+  contentsGrid.innerHTML = '';
+  if (media.length === 0) {
+    contentsGrid.innerHTML = "<p class='text-gray-400 col-span-full'>No media added yet.</p>";
+    return;
+  }
+
+  media.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'bg-gray-800 p-4 rounded-lg shadow-lg flex flex-col gap-3 transition transform hover:scale-[1.02] duration-200';
+
+    if (item.type === 'video') {
+      card.innerHTML = `<video src="${item.url}" controls class="w-full rounded-lg border border-gray-700"></video>`;
+    } else {
+      card.innerHTML = `<img src="${item.url}" alt="Project media" class="w-full rounded-lg border border-gray-700 object-cover">`;
+    }
+
+    contentsGrid.appendChild(card);
+  });
+}
+
+loadProject();
+</script>
+
+</body>
+</html>
