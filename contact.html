@@ -55,6 +55,26 @@
   .icon-bg:hover { box-shadow: 0 0 15px currentColor, 0 0 30px currentColor; transform: scale(1.1); }
   .contact-item a { color: #ff77c0; font-weight: bold; transition: color 0.3s; }
   .contact-item a:hover { color: #ff007f; }
+
+  /* === Mobile Menu Animation === */
+  .mobile-menu-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  .mobile-menu-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+  }
+  .mobile-menu-exit {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .mobile-menu-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+  }
 </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
@@ -68,15 +88,29 @@
 <header class="sticky top-0 z-50 w-full">
   <div class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
     <img src="images/profile.jpg" alt="Logo" class="h-20 w-20 object-cover">
+
+    <!-- Desktop Nav -->
     <nav class="hidden md:flex gap-6 font-medium text-gray-300">
-      <a href="index.html">Home</a>
-      <a href="portfolio.html">Portfolio</a>
-      <a href="contact.html">Contact</a>
+      <a href="index.html" class="hover:text-[#ff007f]">Home</a>
+      <a href="portfolio.html" class="hover:text-[#ff007f]">Portfolio</a>
+      <a href="contact.html" class="hover:text-[#ff007f]">Contact</a>
     </nav>
+
+    <!-- Mobile Hamburger -->
+    <button id="menu-btn" class="md:hidden text-white text-3xl focus:outline-none">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden flex-col items-center bg-black bg-opacity-90 text-gray-300 font-medium space-y-4 py-6 md:hidden border-t border-gray-700">
+    <a href="index.html" class="hover:text-[#ff007f]" onclick="toggleMenu()">Home</a>
+    <a href="portfolio.html" class="hover:text-[#ff007f]" onclick="toggleMenu()">Portfolio</a>
+    <a href="contact.html" class="hover:text-[#ff007f]" onclick="toggleMenu()">Contact</a>
   </div>
 </header>
 
-<!-- Spacer for sticky header -->
+<!-- Spacer -->
 <div class="h-28"></div>
 
 <main class="relative z-10 mt-10 px-6">
@@ -129,7 +163,7 @@
   window.addEventListener('scroll', revealOnScroll);
   window.addEventListener('load', revealOnScroll);
 
-  // ==== FormSpree Submission Script ====
+  // FormSpree Submission
   const form = document.querySelector(".contact-form");
   form.addEventListener("submit", async function(e) {
     e.preventDefault();
@@ -145,6 +179,36 @@
       alert("Oops! Something went wrong.");
     }
   });
+
+  // Mobile Menu with Animation
+  const menuBtn = document.getElementById('menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  let menuOpen = false;
+
+  function toggleMenu() {
+    menuOpen = !menuOpen;
+    if (menuOpen) {
+      mobileMenu.classList.remove('hidden');
+      mobileMenu.classList.add('mobile-menu-enter');
+      setTimeout(() => {
+        mobileMenu.classList.add('mobile-menu-enter-active');
+        mobileMenu.classList.remove('mobile-menu-enter');
+      }, 10);
+      menuBtn.innerHTML = '<i class="fas fa-times"></i>';
+    } else {
+      mobileMenu.classList.add('mobile-menu-exit');
+      setTimeout(() => {
+        mobileMenu.classList.add('mobile-menu-exit-active');
+        setTimeout(() => {
+          mobileMenu.classList.remove('mobile-menu-exit', 'mobile-menu-exit-active');
+          mobileMenu.classList.add('hidden');
+        }, 300);
+      }, 10);
+      menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    }
+  }
+
+  menuBtn.addEventListener('click', toggleMenu);
 </script>
 
 </body>
