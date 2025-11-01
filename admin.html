@@ -5,17 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Admin Panel | Demo Name</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<style>
+  video.bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+  }
+</style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
 
-<header class="sticky top-0 bg-black/80 backdrop-blur-md p-4 border-b border-gray-800 text-center">
+<!-- Background Video -->
+<video autoplay loop muted playsinline class="bg-video">
+  <source src="videos/hero.mp4" type="video/mp4" />
+</video>
+
+<header class="sticky top-0 bg-black/70 backdrop-blur-md p-4 border-b border-gray-800 flex justify-between items-center">
   <h1 class="text-3xl font-bold text-pink-500">Admin Panel</h1>
+  <button onclick="window.location.href='/'" class="bg-pink-500 hover:bg-pink-600 px-4 py-2 rounded font-bold">← Go Back</button>
 </header>
 
-<main class="max-w-xl mx-auto p-6 mt-6 flex flex-col gap-8">
+<main class="max-w-xl mx-auto p-6 mt-6 flex flex-col gap-8 bg-black/40 backdrop-blur-md rounded-xl">
 
   <!-- Login Section -->
-  <section id="login-section" class="bg-gray-800 p-6 rounded-lg shadow-lg">
+  <section id="login-section" class="bg-gray-800/80 p-6 rounded-lg shadow-lg">
     <h2 class="text-xl font-bold text-pink-500 mb-4">Admin Login</h2>
     <form id="login-form" class="flex flex-col gap-4">
       <input type="email" id="login-email" placeholder="Email" class="p-2 rounded bg-gray-700 border border-gray-600" required>
@@ -26,7 +43,7 @@
   </section>
 
   <!-- Create Project -->
-  <section id="project-section" class="bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+  <section id="project-section" class="bg-gray-800/80 p-6 rounded-lg shadow-lg hidden">
     <h2 class="text-xl font-bold text-pink-500 mb-4">Create New Project</h2>
     <form id="create-project-form" class="flex flex-col gap-4">
       <input type="text" id="project-name" placeholder="Project Name" class="p-2 rounded bg-gray-700 border border-gray-600" required>
@@ -37,7 +54,7 @@
   </section>
 
   <!-- Add Media -->
-  <section id="media-section" class="bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+  <section id="media-section" class="bg-gray-800/80 p-6 rounded-lg shadow-lg hidden">
     <h2 class="text-xl font-bold text-pink-500 mb-4">Add Images / Videos</h2>
     <form id="add-media-form" class="flex flex-col gap-4">
       <select id="select-project" class="p-2 rounded bg-gray-700 border border-gray-600" required>
@@ -50,7 +67,7 @@
   </section>
 
   <!-- Manage Projects & Media -->
-  <section id="manage-section" class="bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+  <section id="manage-section" class="bg-gray-800/80 p-6 rounded-lg shadow-lg hidden">
     <h2 class="text-xl font-bold text-pink-500 mb-4">Manage Projects & Media</h2>
     <div id="project-list" class="flex flex-col gap-2"></div>
     <div id="media-list" class="flex flex-col gap-4 mt-4"></div>
@@ -184,7 +201,6 @@ async function loadProjectsList() {
     `;
     projectList.appendChild(div);
 
-    // Edit project
     div.querySelector(".edit-project").addEventListener("click", async () => {
       const newName = prompt("Edit project name:", p.name);
       const newDesc = prompt("Edit description:", p.description);
@@ -195,7 +211,6 @@ async function loadProjectsList() {
       loadProjectsDropdown();
     });
 
-    // Delete project
     div.querySelector(".delete-project").addEventListener("click", async () => {
       if (!confirm("Delete this project? This will also delete associated media.")) return;
 
@@ -237,7 +252,6 @@ async function loadMediaList() {
     `;
     mediaList.appendChild(div);
 
-    // Delete media
     div.querySelector(".delete-media").addEventListener("click", async () => {
       if (!confirm("Delete this media?")) return;
 

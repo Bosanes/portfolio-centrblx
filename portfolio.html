@@ -6,21 +6,65 @@
 <title>Portfolio | Demo Name</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-/* === Folder Icon === */
-#folder-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-weight: bold;
-  color: #f472b6;
-  transition: all 0.3s;
+/* === Background Video === */
+#bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.45;
 }
-#folder-btn:hover {
-  color: #ff007f;
+#bg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: -1;
+  pointer-events: none;
 }
 
-/* === Mobile Hamburger === */
+/* === Dropdown === */
+.dropdown {
+  position: relative;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0;
+  min-width: 180px;
+  z-index: 100;
+}
+.dropdown-menu.active {
+  display: block;
+  animation: fadeIn 0.2s ease-in-out;
+}
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  color: white;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+.dropdown-menu button:hover {
+  background: #ff007f;
+  color: black;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Mobile === */
 #mobile-menu-btn span {
   display: block;
   height: 3px;
@@ -39,8 +83,7 @@
   transform: rotate(-45deg) translateY(-8px);
 }
 
-/* === Mobile Menus === */
-#mobile-menu-panel {
+#mobile-menu-panel, #mobile-projects-panel {
   position: fixed;
   top: 0; left: 0;
   width: 70%;
@@ -52,15 +95,7 @@
   z-index: 50;
 }
 #mobile-projects-panel {
-  position: fixed;
-  top: 0; left: 0;
-  width: 70%;
-  height: 100%;
   background: #1f1f1f;
-  padding: 2rem;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  z-index: 50;
   overflow-y: auto;
 }
 #overlay {
@@ -70,11 +105,8 @@
   display: none;
   z-index: 40;
 }
-#overlay.active {
-  display: block;
-}
+#overlay.active { display: block; }
 
-/* === Project buttons in sidebar === */
 #mobile-projects-panel button {
   display: block;
   width: 100%;
@@ -89,34 +121,49 @@
   background: #ff007f;
   color: black;
 }
+
+/* Keep content above video */
+header, main, section, footer, div {
+  position: relative;
+  z-index: 5;
+}
 </style>
 </head>
+
 <body class="bg-black text-white">
+
+<!-- Background Video -->
+<video id="bg-video" autoplay muted loop playsinline>
+  <source src="videos/hero.mp4" type="video/mp4">
+</video>
+<div id="bg-overlay"></div>
 
 <!-- Header -->
 <header class="sticky top-0 bg-black/80 backdrop-blur-md p-4 border-b border-gray-800 z-50">
   <div class="max-w-6xl mx-auto flex justify-between items-center px-6 relative">
-    <!-- Logo -->
     <img src="images/profile.jpg" alt="Logo" class="h-16 w-16 object-cover rounded-full border-2 border-pink-500">
 
     <!-- Desktop Nav -->
-    <nav class="hidden md:flex gap-6 font-medium text-gray-300">
+    <nav class="hidden md:flex gap-6 font-medium text-gray-300 items-center">
       <a href="index.html" class="hover:text-pink-500">Home</a>
-      <a href="portfolio.html" class="hover:text-pink-500">Portfolio</a>
+      <div class="dropdown">
+        <button id="dropdown-toggle" class="hover:text-pink-500 flex items-center gap-1">
+          Projects ▼
+        </button>
+        <div id="dropdown-menu" class="dropdown-menu"></div>
+      </div>
       <a href="contact.html" class="hover:text-pink-500">Contact</a>
       <a href="admin.html" class="hover:text-pink-500">Admin</a>
     </nav>
 
     <!-- Mobile Hamburger -->
     <button id="mobile-menu-btn" class="md:hidden flex flex-col justify-center items-center">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 
-<!-- Mobile Links Panel -->
+<!-- Mobile Panels -->
 <div id="mobile-menu-panel" class="md:hidden">
   <a href="index.html" class="block text-white text-lg py-2">Home</a>
   <a href="portfolio.html" class="block text-white text-lg py-2">Portfolio</a>
@@ -124,14 +171,13 @@
   <a href="admin.html" class="block text-white text-lg py-2">Admin</a>
 </div>
 
-<!-- Mobile Projects Panel -->
 <div id="mobile-projects-panel" class="md:hidden">
   <h2 class="text-pink-500 font-bold text-lg mb-4">Projects</h2>
 </div>
 
 <div id="overlay"></div>
 
-<!-- Hero + Folder -->
+<!-- Hero -->
 <div class="max-w-6xl mx-auto px-6 mt-8 relative">
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-4xl font-bold text-pink-500">Portfolio Projects</h1>
@@ -140,7 +186,6 @@
     </div>
   </div>
 
-  <!-- Projects Grid -->
   <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="projects-grid"></section>
 </div>
 
@@ -148,30 +193,32 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = "https://jprslkrxccjefudlismu.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcnNsa3J4Y2NqZWZ1ZGxpc211Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NjY1MzAsImV4cCI6MjA3NTQ0MjUzMH0.LuMD06T2NTE2G7AEcynCKPUboulhybm6l4YKjCFpCyo"; // Replace
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcnNsa3J4Y2NqZWZ1ZGxpc211Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NjY1MzAsImV4cCI6MjA3NTQ0MjUzMH0.LuMD06T2NTE2G7AEcynCKPUboulhybm6l4YKjCFpCyo";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const projectsGrid = document.getElementById('projects-grid');
 const folderBtn = document.getElementById('folder-btn');
 const mobileProjectsPanel = document.getElementById('mobile-projects-panel');
-
 const mobileMenuBtn = document.getElementById('mobile-menu-btn');
 const mobileMenuPanel = document.getElementById('mobile-menu-panel');
 const overlay = document.getElementById('overlay');
+const dropdownToggle = document.getElementById('dropdown-toggle');
+const dropdownMenu = document.getElementById('dropdown-menu');
 
 let allProjects = [];
 
-// Load projects
 async function loadProjects() {
-  const { data: projects, error } = await supabase.from('projects').select('id, name, description').order('created_at', { ascending: false });
-  if(error) return console.error(error);
+  const { data: projects, error } = await supabase
+    .from('projects')
+    .select('id, name, description')
+    .order('created_at', { ascending: false });
+  if (error) return console.error(error);
   allProjects = projects;
-
   renderProjects();
+  renderDropdown();
   renderMobileProjectsPanel();
 }
 
-// Render projects grid
 function renderProjects(projectId = null) {
   const projectsToShow = projectId ? allProjects.filter(p => p.id === projectId) : allProjects;
   projectsGrid.innerHTML = '';
@@ -179,11 +226,11 @@ function renderProjects(projectId = null) {
     const { data: media } = await supabase.from('media').select('url, type').eq('project_id', p.id);
     let mediaHTML = '';
     media?.forEach(item => {
-      if(item.type === 'video') mediaHTML += `<video src="${item.url}" controls class="w-full rounded"></video>`;
+      if (item.type === 'video') mediaHTML += `<video src="${item.url}" controls class="w-full rounded"></video>`;
       else mediaHTML += `<img src="${item.url}" class="w-full rounded">`;
     });
     const card = document.createElement('div');
-    card.className = 'bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-pink-500/50 transition-all';
+    card.className = 'bg-gray-800/70 p-4 rounded-lg shadow-lg hover:shadow-pink-500/50 transition-all backdrop-blur';
     card.innerHTML = `
       <h2 class="text-xl font-bold text-pink-500 mb-2">${p.name}</h2>
       <p class="text-gray-300 mb-2">${p.description}</p>
@@ -193,9 +240,52 @@ function renderProjects(projectId = null) {
   });
 }
 
-// Render mobile projects panel
+function renderDropdown() {
+  dropdownMenu.innerHTML = '';
+  
+  const allBtn = document.createElement('button');
+  allBtn.textContent = 'All Projects';
+  allBtn.addEventListener('click', () => {
+    renderProjects();
+    dropdownMenu.classList.remove('active');
+  });
+  dropdownMenu.appendChild(allBtn);
+
+  const hr = document.createElement('hr');
+  hr.className = 'border-gray-700 my-1';
+  dropdownMenu.appendChild(hr);
+
+  allProjects.forEach(p => {
+    const btn = document.createElement('button');
+    btn.textContent = p.name;
+    btn.addEventListener('click', () => {
+      renderProjects(p.id);
+      dropdownMenu.classList.remove('active');
+    });
+    dropdownMenu.appendChild(btn);
+  });
+}
+
+
 function renderMobileProjectsPanel() {
-  mobileProjectsPanel.innerHTML = `<h2 class="text-pink-500 font-bold text-lg mb-4">Projects</h2>`;
+  mobileProjectsPanel.innerHTML = `
+    <h2 class="text-pink-500 font-bold text-lg mb-4">Projects</h2>
+  `;
+
+  // "All Projects" button
+  const allBtn = document.createElement('button');
+  allBtn.textContent = 'All Projects';
+  allBtn.addEventListener('click', () => {
+    renderProjects();
+    closeMobileProjectsPanel();
+  });
+  mobileProjectsPanel.appendChild(allBtn);
+
+  const hr = document.createElement('hr');
+  hr.className = 'border-gray-700 my-2';
+  mobileProjectsPanel.appendChild(hr);
+
+  // Individual projects
   allProjects.forEach(p => {
     const btn = document.createElement('button');
     btn.textContent = p.name;
@@ -207,20 +297,25 @@ function renderMobileProjectsPanel() {
   });
 }
 
-// Mobile menu toggle
+
+// === Menu Toggles ===
 mobileMenuBtn.addEventListener('click', () => {
   mobileMenuBtn.classList.toggle('open');
-  mobileMenuPanel.style.transform = mobileMenuPanel.style.transform === 'translateX(0%)' ? 'translateX(-100%)' : 'translateX(0%)';
+  mobileMenuPanel.style.transform =
+    mobileMenuPanel.style.transform === 'translateX(0%)'
+      ? 'translateX(-100%)'
+      : 'translateX(0%)';
   overlay.classList.toggle('active');
 });
 
-// Folder button toggle (mobile)
 folderBtn.addEventListener('click', () => {
-  mobileProjectsPanel.style.transform = mobileProjectsPanel.style.transform === 'translateX(0%)' ? 'translateX(-100%)' : 'translateX(0%)';
+  mobileProjectsPanel.style.transform =
+    mobileProjectsPanel.style.transform === 'translateX(0%)'
+      ? 'translateX(-100%)'
+      : 'translateX(0%)';
   overlay.classList.toggle('active');
 });
 
-// Overlay click closes everything
 overlay.addEventListener('click', () => {
   mobileMenuBtn.classList.remove('open');
   mobileMenuPanel.style.transform = 'translateX(-100%)';
@@ -232,6 +327,17 @@ function closeMobileProjectsPanel() {
   mobileProjectsPanel.style.transform = 'translateX(-100%)';
   overlay.classList.remove('active');
 }
+
+// === Dropdown toggle ===
+dropdownToggle.addEventListener('click', () => {
+  dropdownMenu.classList.toggle('active');
+});
+
+document.addEventListener('click', (e) => {
+  if (!dropdownMenu.contains(e.target) && !dropdownToggle.contains(e.target)) {
+    dropdownMenu.classList.remove('active');
+  }
+});
 
 loadProjects();
 </script>
